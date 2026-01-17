@@ -1,0 +1,185 @@
+{
+  "name": "Gmail Task Order",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5e19ac2c-cc7b-4457-97b7-310717526cf1",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9Lv4Ogkz4KO4sgqa",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}",
+        "simple": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "9e845f36-d3b3-412b-9d64-f422d0532881",
+      "name": "Get a message",
+      "webhookId": "d62f0f2d-efd2-420c-8675-7700480e2a9d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9Lv4Ogkz4KO4sgqa",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bbd7666f-4a6b-4298-a1ea-1919df3a46fb",
+              "name": "Label",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "52e9a7f1-36ed-48a4-94dc-63885740f838",
+              "name": "Content",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "74d28481-80c9-465c-9462-3241c5ffbf47",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "listId": "6827326d537f44b4b514ad8f",
+        "name": "={{ $json.Label }}",
+        "description": "={{ $json.Content }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "39356e77-dbd1-4464-8d04-7bcde5ced780",
+      "name": "Create a card",
+      "credentials": {
+        "trelloApi": {
+          "id": "xmfdTSEQqrfzTkL3",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        832,
+        0
+      ],
+      "id": "887c4d9f-a309-42dc-a84a-92a24b9b54f8",
+      "name": "Mark a message as read",
+      "webhookId": "5d66f91d-2f9c-4c7c-b082-6113756502a3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9Lv4Ogkz4KO4sgqa",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a message": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Create a card",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a card": {
+      "main": [
+        [
+          {
+            "node": "Mark a message as read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "93336050-0d03-4a3d-be3c-6fad9ed71ddc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b4ce499dd54e0958a9a7273d6b016310d08a100c93eb53087c344e754aea6959"
+  },
+  "id": "yhhlC3PXdaZxaGqws8Tpc",
+  "tags": []
+}
